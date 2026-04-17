@@ -319,7 +319,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:var(--g1);font-famil
     </div>
 
     <div class="sync-section">
-      <div class="sync-label">📤 Export — 최근 3일 데이터 내보내기</div>
+      <div class="sync-label">📤 Export — 현재 학습 데이터 내보내기</div>
       <div class="sync-export-box" id="sync-export-box"></div>
       <div class="sync-size-hint" id="sync-size-hint"></div>
       <button class="sync-copy-btn" id="sync-copy-btn">
@@ -1151,19 +1151,14 @@ function decodeData(str){
 }
 
 function buildDeltaPayload(lang,days=3){
-  const today=new Date();
-  const cycleStart=lang.cycleStart||lang.lastDate||today.toISOString().slice(0,10);
-  const cycleStartMs=new Date(cycleStart).getTime();
-  const recentDayNums=new Set();
-  for(let i=0;i<days;i++){
-    const d=new Date(today);d.setDate(d.getDate()-i);
-    const diffDays=Math.floor((d.getTime()-cycleStartMs)/86400000);
-    const dayNum=(diffDays%7)+1;
-    if(dayNum>=1&&dayNum<=7)recentDayNums.add(dayNum);
-  }
+  // 날짜 계산 대신: 단어가 있는 모든 day를 포함
+  // (day 1~7 중 words.length > 0 인 것 전부)
   const deltaWeeks=(lang.weeks||[]).map(week=>{
     const deltaDays={};
-    recentDayNums.forEach(d=>{const words=week.days[d]||[];if(words.length>0)deltaDays[d]=words});
+    for(let d=1;d<=7;d++){
+      const words=week.days[d]||[];
+      if(words.length>0)deltaDays[d]=words;
+    }
     if(Object.keys(deltaDays).length===0)return null;
     return{idx:week.idx,days:deltaDays,wrongCounts:week.wrongCounts||{}};
   }).filter(Boolean);
@@ -1206,7 +1201,7 @@ function openSync(){
   const deltaSize=_syncExportCode.length;
   const saving=fullSize>deltaSize?Math.round((1-deltaSize/fullSize)*100):0;
   document.getElementById('sync-size-hint').textContent=
-    `${state.langs.length}개 언어 · 최근 3일 · ${totalWords}개 단어 · ${deltaSize}자${saving>0?' (전체 대비 '+saving+'% 절약)':''}`;
+    `${state.langs.length}개 언어 · ${totalWords}개 단어 · ${deltaSize}자${saving>0?' (전체 대비 '+saving+'% 절약)':''}`;
   document.getElementById('sync-import-ta').value='';
   document.getElementById('sync-import-btn').disabled=true;
   const btn=document.getElementById('sync-copy-btn');
