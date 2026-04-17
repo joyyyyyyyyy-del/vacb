@@ -1095,29 +1095,48 @@ function commitBulk(){
 /* ── SYNC ── */
 function compressPayload(obj){
   return JSON.stringify(obj)
-    .replace(/"weeks":/g,'"W":').replace(/"days":/g,'"D":')
-    .replace(/"wrongCounts":/g,'"E":').replace(/"word":/g,'"w":')
-    .replace(/"meaning":/g,'"m":').replace(/"streak":/g,'"S":')
-    .replace(/"lastDate":/g,'"L":').replace(/"_delta":/g,'"d":')
-    .replace(/"_days":/g,'"dd":').replace(/"_multiLang":/g,'"ML":')
-    .replace(/"exportedAt":/g,'"eA":').replace(/"langs":/g,'"lg":')
-    .replace(/"delta":/g,'"dt":').replace(/"name":/g,'"n":')
-    .replace(/"color":/g,'"c":').replace(/"idx":/g,'"i":')
-    .replace(/"openWeeks":/g,'"oW":').replace(/"curWeek":/g,'"cW":')
-    .replace(/"curDay":/g,'"cD":');
+    // 긴 키 먼저 (짧은 키의 부분문자열이 되는 것 방지)
+    .replace(/"wrongCounts":/g,'"§E":')
+    .replace(/"lastDate":/g,'"§L":')
+    .replace(/"openWeeks":/g,'"§oW":')
+    .replace(/"curWeek":/g,'"§cW":')
+    .replace(/"curDay":/g,'"§cD":')
+    .replace(/"_multiLang":/g,'"§ML":')
+    .replace(/"exportedAt":/g,'"§eA":')
+    .replace(/"_delta":/g,'"§d":')
+    .replace(/"_days":/g,'"§dd":')
+    .replace(/"streak":/g,'"§S":')
+    .replace(/"meaning":/g,'"§m":')
+    .replace(/"color":/g,'"§c":')
+    .replace(/"langs":/g,'"§lg":')
+    .replace(/"delta":/g,'"§dt":')
+    .replace(/"weeks":/g,'"§W":')
+    .replace(/"days":/g,'"§D":')
+    .replace(/"word":/g,'"§w":')
+    .replace(/"name":/g,'"§n":')
+    .replace(/"idx":/g,'"§i":');
 }
 function decompressPayload(json){
   return json
-    .replace(/"W":/g,'"weeks":').replace(/"D":/g,'"days":')
-    .replace(/"E":/g,'"wrongCounts":').replace(/"w":/g,'"word":')
-    .replace(/"m":/g,'"meaning":').replace(/"S":/g,'"streak":')
-    .replace(/"L":/g,'"lastDate":').replace(/"d":/g,'"_delta":')
-    .replace(/"dd":/g,'"_days":').replace(/"ML":/g,'"_multiLang":')
-    .replace(/"eA":/g,'"exportedAt":').replace(/"lg":/g,'"langs":')
-    .replace(/"dt":/g,'"delta":').replace(/"n":/g,'"name":')
-    .replace(/"c":/g,'"color":').replace(/"i":/g,'"idx":')
-    .replace(/"oW":/g,'"openWeeks":').replace(/"cW":/g,'"curWeek":')
-    .replace(/"cD":/g,'"curDay":');
+    .replace(/"§oW":/g,'"openWeeks":')
+    .replace(/"§cW":/g,'"curWeek":')
+    .replace(/"§cD":/g,'"curDay":')
+    .replace(/"§ML":/g,'"_multiLang":')
+    .replace(/"§eA":/g,'"exportedAt":')
+    .replace(/"§dd":/g,'"_days":')
+    .replace(/"§d":/g,'"_delta":')
+    .replace(/"§E":/g,'"wrongCounts":')
+    .replace(/"§L":/g,'"lastDate":')
+    .replace(/"§S":/g,'"streak":')
+    .replace(/"§m":/g,'"meaning":')
+    .replace(/"§c":/g,'"color":')
+    .replace(/"§lg":/g,'"langs":')
+    .replace(/"§dt":/g,'"delta":')
+    .replace(/"§W":/g,'"weeks":')
+    .replace(/"§D":/g,'"days":')
+    .replace(/"§w":/g,'"word":')
+    .replace(/"§n":/g,'"name":')
+    .replace(/"§i":/g,'"idx":');
 }
 function encodeData(obj){
   return btoa(unescape(encodeURIComponent(compressPayload(obj))));
@@ -1125,7 +1144,7 @@ function encodeData(obj){
 function decodeData(str){
   try{
     const compressed=decodeURIComponent(escape(atob(str.trim())));
-    const json=compressed.includes('"W":')
+    const json=compressed.includes('"§')
       ?decompressPayload(compressed):compressed;
     return JSON.parse(json);
   }catch{return null}
